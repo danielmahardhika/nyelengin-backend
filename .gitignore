@@ -1,6 +1,8 @@
 # C# & .NET
 user-service/bin/
 user-service/obj/
+bin/
+obj/
 *.user
 
 # Java & Spring Boot
