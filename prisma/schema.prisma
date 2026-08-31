@@ -1,0 +1,108 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum SpaceType {
+  PERSONAL
+  SHARED
+  ENTERPRISE
+}
+
+enum SpaceRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+enum AccountType {
+  ASSET
+  INCOME
+  EXPENSE
+}
+
+enum EntryType {
+  DEBIT
+  CREDIT
+}
+
+model User {
+  id            String         @id @default(uuid()) @db.Uuid
+  username      String         @unique
+  email         String         @unique
+  password_hash String
+  created_at    DateTime       @default(now())
+  
+  space_members SpaceMember[]
+  transactions  Transaction[]
+
+  @@map("users")
+}
+
+model Space {
+  id         String        @id @default(uuid()) @db.Uuid
+  name       String
+  type       SpaceType
+  created_at DateTime      @default(now())
+  
+  members    SpaceMember[]
+  accounts   Account[]
+
+  @@map("spaces")
+}
+
+model SpaceMember {
+  space_id  String    @db.Uuid
+  user_id   String    @db.Uuid
+  role      SpaceRole
+  joined_at DateTime  @default(now())
+
+  space     Space     @relation(fields: [space_id], references: [id])
+  user      User      @relation(fields: [user_id], references: [id])
+
+  @@id([space_id, user_id])
+  @@map("space_members")
+}
+
+model Account {
+  id       String        @id @default(uuid()) @db.Uuid
+  space_id String        @db.Uuid
+  name     String
+  type     AccountType
+  
+  space    Space         @relation(fields: [space_id], references: [id])
+  entries  JournalEntry[]
+
+  @@map("accounts")
+}
+
+model Transaction {
+  id               String         @id @default(uuid()) @db.Uuid
+  reference_code   String         @unique
+  description      String
+  transaction_date DateTime
+  created_by       String         @db.Uuid
+  created_at       DateTime       @default(now())
+  
+  user             User           @relation(fields: [created_by], references: [id])
+  entries          JournalEntry[]
+
+  @@map("transactions")
+}
+
+model JournalEntry {
+  id             String      @id @default(uuid()) @db.Uuid
+  transaction_id String      @db.Uuid
+  account_id     String      @db.Uuid
+  type           EntryType
+  amount         Decimal     @db.Decimal(19, 4)
+  
+  transaction    Transaction @relation(fields: [transaction_id], references: [id])
+  account        Account     @relation(fields: [account_id], references: [id])
+
+  @@map("journal_entries")
+}
