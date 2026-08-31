@@ -1,0 +1,15 @@
+# C# & .NET
+user-service/bin/
+user-service/obj/
+*.user
+
+# Java & Spring Boot
+target/
+*.class
+.gradle/
+build/
+
+# Mac OS & IDE
+.DS_Store
+.vscode/
+.idea/
