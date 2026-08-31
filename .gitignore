@@ -13,3 +13,15 @@ build/
 .DS_Store
 .vscode/
 .idea/
+.env
+
+# Environment & Dependencies
+.env
+node_modules/
+package-lock.json
+
+# IDE & AI Assistant Folders
+.agents/
+.claude/
+.cursor/
+.devin/
